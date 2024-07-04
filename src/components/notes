@@ -1,0 +1,287 @@
+SLIDER COMPONENTS
+    => to move a screene we used style attribute
+    CODE: 
+        // TO MOVE pg USING DOTS
+        //here current value is the index value
+        
+---------->>>> style={{transform: `translateX(-${current * 100}vw)`}}>
+        
+   
+    => to create dots in that img slider to move
+    CODE:
+        //DOTS 
+        // dots to place in center
+
+        //usestate : const [current,setCurrent] = useState(0);
+
+----------->>>>   div className="absolute m-auto left-1/2 bottom-8 flex gap-4">
+          {slides.map((slide,index)=>(
+           
+            // OUTER RING
+            
+            <div
+            className={`w-3 h-3 rounded-full ring-1 ring-gray-600 cursor-pointer flex items-cennter justify-center ${current === index ? "scale-150" : ""}`}
+            key={slide.id}
+            onClick={()=>setCurrent(index)}>
+         
+           {/* INNER DOT */}
+         
+           {
+            current === index && (
+                <div className="w-[5px] h-[5px] bg-gray-600 rounded-full mt-[3.6px]">
+
+                </div>
+            )
+           }
+            </div>
+        ))}
+
+        </div>
+
+
+3 SEC ONCE CHANGE THE SLIDER
+
+CODE:
+
+-------->>>>useEffect(()=> {
+                const interval = setInterval(() => {
+                    setCurrent(prev => (prev === slides.length-1 ? 0 : prev+1))
+                },3000);
+
+                return () => clearInterval(interval);
+            },[]);
+
+//FILTER COMPONENT
+
+--------->>>><select name="type" id=""
+             className='py-2 px-4 rounded-2xl textx-xs font-medium bg-[#EBEDED]'>
+                <option value="physical">Physical</option>
+                <option value="digital">Digital</option>
+            </select>
+     
+            <input type="text"
+            name="min"
+            placeholder='min price'
+            className='text-xs rounded-2xl pl-2 w-24 ring-1 ring-gray-400' />
+            
+            
+//PRODUCT IMAGES PAGE [SLUG]
+
+----------->>>>
+      !IMP------->>> const [index,setIndex] = useState(0)
+               <div className=''>
+                {/* 1.MAIN IMG   */}
+                <div className='h-[500px] relative'>
+      !IMP------->>><Image src={images[index].url}
+                alt=""
+                fill
+                sizes="50vw"
+                className='object-cover rounded-md'/>
+                </div>
+                {/* 2.SMALL IMG */}
+                <div className='flex justify-between gap-4 mt-8'>
+                    {images.map((img,i) => (
+                        <div className='w-1/4 h-32 relative gap-4 mt-8' key={img.id} 
+      !IMP-------->>  onClick={()=>setIndex(i)}>
+                        <Image src={img.url}
+                        alt=""
+                        fill
+                        sizes="30vw"
+                        className='object-cover rounded-md'/>
+                        </div>
+                    ))}
+                </div>
+//COLORS SELECTED ONE,UNSELECTED ONE,OUT OF STOCK/NOT AVAILABLE ONE STYLE  
+ ---------->>> <h4 className='font-medium'>Choose a sizes</h4>
+
+ {/* not selected one */}
+<ul className='flex items-center gap-3'>
+ 
+ <li className='ring-1 ring-cpink text-cpink rounded-md px-4 py-1 text-sm cursor-pointer'>Small</li>
+
+ {/* selected one */}
+ <li className='ring-1 ring-cpink text-white bg-cpink rounded-md px-4 py-1 text-sm cursor-pointer'>Medium</li>
+
+ {/* not available sizes */}
+ <li className='ring-1 ring-pink-200 text-white bg-pink-200 rounded-md px-4 py-1 text-sm cursor-pointer'>Large</li>
+</ul>
+        
+
+//TO ADD OR LESS QUANTITY 
+
+--------->>>const Add = () => {
+
+-->!!!.STATE    const [quantity , setQuantity] = useState(1)
+    
+                //TEMPPORARY
+                const stock =4
+            
+--->>FUNC       const handleQuantity = (type: "i" | "d")=>{
+                if (type === "d" && quantity > 1){
+                setQuantity((prev)=> prev -1)
+                }
+                if (type === "i" && quantity < stock){
+                setQuantity((prev)=> prev +1)
+                }
+                }
+  
+    return (
+      <div className='flex flex-col gap-4'>
+            <h4 className='font-medium '>Choose a Quantity</h4>
+  
+            
+            <div className='flex justify-between'>
+  
+              {/* 1.qty and text */}
+              
+              <div className='flex items-center gap-4'>
+                {/* qty */}
+                <div className='bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32'>
+---------->>>!!!! <button className='cursor-pointer text-xl' onClick={()=>handleQuantity("d")}>-</button>
+                  {quantity}
+                  <button className='cursor-pointer text-xl' onClick={()=>handleQuantity("i")}>+</button>
+                </div>
+21/6/2024
+
+    we added wix setup and also created products and categories in wix then client id from wix ,save that in .env file and added in context-> wix context .  
+
+       [ACTUALLY .ENV LA WIX CLIENT ID NOT WRKING SO WE DIRECTLY GAVE CLIENT ID IN WIX CONTENT CLIENT ID....]
+
+    =>In wix context we have tokens smthg it basically represent our cookies tokens when a user visites our website we gonna automatically create a refresh tokens even if that user is not logged they wwere able to add new prd inside they cart and they refresh pg those prds will stay on that cart that becz we gonna using exactly same tokens.
+
+    =>for the user request gonna using this access tokens 
+
+    =>i'm gonna check my cookies if the user never visited this pg there will be no cookie in this case the refresh tokens will be empty .
+
+    =>in wix context is use client so we cant reach out cookie directly so i installed a library called """Js-cookie""" then install its tpes """npm i --save-dev @types/js-cookie """"
+
+//CHECKING COOKIES 
+
+--->>>const refreshToken = JSON.parse(Cookies.get("refreshToken") || "{}")
+
+   =>then we gonna export our wix client using that client we'll be able to fetch our product
+
+
+   =>then we cleared tokens and added this
+----->>>    tokens: {
+            refreshToken,accessToken:{value:"" , expiresAt:0}
+}
+
+//exports all in wix contetxt
+
+---->>
+        export type WixClient = typeof wixClient ;
+
+        export const WixClientContext = createContext<WixClient>(wixClient)
+        //actually im passing wixClinet and <>- type.type as well
+
+        export const WixClientContextProvider =({children} : {children:ReactNode;}) => {
+            return <WixClientContext.Provider value={wixClient}>
+                {children}
+            </WixClientContext.Provider>
+        }
+        //wrapping our children using wixClientContextProvider so we can use that wixClient everywhere. lte's wrap our app using this provider so i gonna open up my layout...
+
+//just using wux in home poge
+
+
+const wixClient = useContext(WixClientContext);
+!!!!IMP .....
+     instead of calling evrytime this context create a own hooks  so created a COMPONENTS hooks--> useWixClient.tsx
+  
+useEffect(()=> {
+
+  //Fetching products from wix client
+    //   After creating a client, you can use it to call APIs.
+    // For example:
+    // Copy
+    // const { items } = await myWixClient.products.queryProducts().find();
+
+
+  const getProducts = async () => {
+    const res = await wixClient.products.queryProducts().find();
+
+   console.log(res)
+
+  }
+
+
+},[wixClient])
+
+//useWixClient.tsx
+
+22/06/2024
+
+what abt server components i wnat to fetch items using server side comp becz its imp for SEo or when we fetch a single prd again it should be a server component so i'm gonna create a another wix client but this time we r not connceting a context api so basicxally when we fetch data from the backend we gonna use this server side wix client.when we manage our carts,the user info,the authendictaion we gonna be using the client side
+
+usin that res.item we can show all products there.
+
+
+EXPALANATION OF KEY TERMS  
+
+Cookies: Small pieces of data stored by the web browser. They are often used to keep track of user sessions, preferences, or other pieces of information needed by the web application.
+
+
+Token: A piece of data, usually a string, that is used for authentication and authorization. Tokens can represent user identity and are often used in API calls to verify the user's permissions.
+
+Authentication is the process of verifying the identity of a user, device, or system. It answers the question, "Who are you?" In web applications, this is typically done through credentials such as usernames and passwords, tokens, or other methods like biometric data. Authentication ensures that the person or system is who they claim to be
+
+
+Authorization is the process of determining what an authenticated user or system is allowed to do. It answers the question, "What can you do?" Once a user's identity is verified through authentication, the system needs to check their permissions and access levels to decide what resources they can access and what actions they can perform.
+
+
+Credentials are pieces of information used to verify the identity of a user or system. They are used during the authentication process and can take various forms:
+Credentials are the data provided to authenticate the user.
+
+Username and Password: The most common form of credentials.
+Tokens: Such as JSON Web Tokens (JWT) or OAuth tokens, which can be used for stateless authentication.
+Certificates: Digital certificates used in SSL/TLS for secure communications.
+Biometric Data: Fingerprints, facial recognition, or other biological traits.
+
+"'"'"""""""""""""How They Work Together"""""""""""""'"'"
+
+Authentication:
+
+A user tries to log in to a system.
+They provide their credentials (e.g., username and password).
+The system verifies the credentials against stored data.
+If the credentials match, the user is authenticated.
+Authorization:
+
+Once authenticated, the system checks the user's permissions.
+The system uses the user's roles, access control lists, or other rules to determine what resources the user can access and what actions they can perform.
+The user is granted or denied access based on these permissions.
+
+
+/       // //Fetching products from wix client
+//       // const getProducts = async () => {
+//       //   const res = await wixClient.products.queryProducts().find();
+
+//       //  console.log(res)
+
+//       // }
+//       // getProducts()
+
+
+//  const res = await wixClient.products.queryProducts().find();
+//  console.log("product fetched: ",res);
+
+
+//  [ //calling wixcontext
+//   const wixClient = useWixClient()
+
+------------------------------------------------------------------------------------------
+
+after a longggggggggggg longggggggggggg days yess i'm back
+
+04/07/2024
+
+we have done the wixclient but wix server cannot be fetch due to some reason i have tired several times but i can't but now its no need so later we will see......
+
+
+
+
+
+
+
+
